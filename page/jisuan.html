@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售顾问管理系统 - 提成计算</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        info: '#1890FF',
+                        dark: '#1D2129',
+                        'gray-light': '#F2F3F5',
+                        'gray-medium': '#C9CDD4'
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .sidebar-shadow {
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            }
+            .transition-bg {
+                transition: background-color 0.2s ease;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-light text-dark min-h-screen flex flex-col">
+    <div class="flex flex-1 overflow-hidden">
+        
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white h-16 flex items-center justify-between px-6 shadow-sm z-10">
+                <div class="flex items-center">
+                    <button class="md:hidden mr-4 text-gray-500" id="sidebarToggle">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold">销售提成计算</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                      
+                    </div>
+                    
+                
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- 筛选和统计卡片 -->
+                <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-lg font-bold">提成计算与查询</h3>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <div class="flex items-center">
+                                <label class="text-sm text-gray-600 mr-2">计算周期:</label>
+                                <select class="border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white text-sm">
+                                    <option>本月</option>
+                                    <option>上月</option>
+                                    <option>本季度</option>
+                                    <option>上季度</option>
+                                    <option>本年</option>
+                                    <option>自定义</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <label class="text-sm text-gray-600 mr-2">部门:</label>
+                                <select class="border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white text-sm">
+                                    <option>全部部门</option>
+                                    <option>销售一部</option>
+                                    <option>销售二部</option>
+                                    <option>销售三部</option>
+                                </select>
+                            </div>
+                            
+                            <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1" id="calculateBtn">
+                                <i class="fa fa-calculator"></i>
+                                <span>重新计算</span>
+                            </button>
+                            
+                            <button class="border border-gray-200 hover:bg-gray-50 text-gray-600 px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1">
+                                <i class="fa fa-download"></i>
+                                <span>导出提成表</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 提成概览卡片 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">总提成金额</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">¥208,750</h4>
+                                <span class="text-danger text-sm flex items-center">
+                                    <i class="fa fa-arrow-down mr-1"></i> 3.1%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">较上月减少 ¥6,750</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">平均提成金额</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">¥8,750</h4>
+                                <span class="text-danger text-sm flex items-center">
+                                    <i class="fa fa-arrow-down mr-1"></i> 2.8%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">较上月减少 ¥250</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">最高提成金额</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">¥18,520</h4>
+                                <span class="text-success text-sm flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 5.2%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">张小明 - 销售一部</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">提成发放状态</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">未发放</h4>
+                                <span class="text-warning text-sm flex items-center">
+                                    <i class="fa fa-clock-o mr-1"></i> 待处理
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">预计发放日期: 下月10日</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 提成图表和规则 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-xl p-6 card-shadow lg:col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg">提成金额分布</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-sm bg-primary text-white rounded-md">本月</button>
+                                <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md transition-colors">上月</button>
+                                <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md transition-colors">季度</button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="commissionChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h3 class="font-bold text-lg mb-4">提成计算规则</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 border border-gray-100 rounded-lg bg-gray-50">
+                                <h4 class="font-medium text-primary mb-2">基础提成比例</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex justify-between">
+                                        <span>销售额 ≤ ¥50,000</span>
+                                        <span class="font-medium">5%</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span>¥50,000 < 销售额 ≤ ¥100,000</span>
+                                        <span class="font-medium">7%</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span>¥100,000 < 销售额 ≤ ¥200,000</span>
+                                        <span class="font-medium">10%</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span>销售额 > ¥200,000</span>
+                                        <span class="font-medium">12%</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="p-4 border border-gray-100 rounded-lg bg-gray-50">
+                                <h4 class="font-medium text-primary mb-2">额外奖励</h4>
+                                <ul class="space-y-2 text-sm">
+                                    <li class="flex justify-between">
+                                        <span>月度销售冠军</span>
+                                        <span class="font-medium text-success">+¥2,000</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span>季度销售冠军</span>
+                                        <span class="font-medium text-success">+¥5,000</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span>新客户开发奖</span>
+                                        <span class="font-medium text-success">+3%</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <button class="w-full mt-2 text-primary hover:text-primary/80 text-sm flex items-center justify-center py-2 border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors">
+                                <i class="fa fa-edit mr-1"></i>
+                                <span>编辑提成规则</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 销售顾问提成明细 -->
+                <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <h3 class="font-bold text-lg">销售顾问提成明细</h3>
+                        <div class="relative">
+                            <input type="text" placeholder="搜索销售顾问..." class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full sm:w-64 text-sm">
+                            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">销售顾问</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">部门</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">本月销售额</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">提成比例</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">基础提成</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">奖励金额</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">应发提成</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">状态</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1012/40/40" alt="张小明" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">张小明</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售一部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥185,200</td>
+                                    <td class="px-6 py-4 text-sm">10%</td>
+                                    <td class="px-6 py-4 text-sm">¥16,520</td>
+                                    <td class="px-6 py-4 text-sm text-success">+¥2,000</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-primary">¥18,520</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">未发放</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-info hover:text-info/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary/80" title="编辑提成">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1027/40/40" alt="李华" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">李华</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售二部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥168,750</td>
+                                    <td class="px-6 py-4 text-sm">10%</td>
+                                    <td class="px-6 py-4 text-sm">¥14,875</td>
+                                    <td class="px-6 py-4 text-sm text-success">+¥1,500</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-primary">¥16,375</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">未发放</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-info hover:text-info/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary/80" title="编辑提成">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1025/40/40" alt="王芳" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">王芳</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售一部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥142,300</td>
+                                    <td class="px-6 py-4 text-sm">10%</td>
+                                    <td class="px-6 py-4 text-sm">¥12,230</td>
+                                    <td class="px-6 py-4 text-sm text-success">+¥800</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-primary">¥13,030</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">未发放</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-info hover:text-info/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary/80" title="编辑提成">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1074/40/40" alt="赵强" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">赵强</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售三部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥128,500</td>
+                                    <td class="px-6 py-4 text-sm">10%</td>
+                                    <td class="px-6 py-4 text-sm">¥10,850</td>
+                                    <td class="px-6 py-4 text-sm text-success">+¥500</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-primary">¥11,350</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">未发放</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-info hover:text-info/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary/80" title="编辑提成">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1066/40/40" alt="刘强" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">刘强</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售三部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥112,800</td>
+                                    <td class="px-6 py-4 text-sm">7%</td>
+                                    <td class="px-6 py-4 text-sm">¥7,896</td>
+                                    <td class="px-6 py-4 text-sm text-success">+¥300</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-primary">¥8,196</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">未发放</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-info hover:text-info/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-primary hover:text-primary/80" title="编辑提成">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="text-sm text-gray-500">
+                            显示 1 到 5 条，共 24 条记录
+                        </div>
+                        
+                        <div class="flex items-center space-x-1">
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i class="fa fa-angle-left"></i>
+                            </button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">2</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">3</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">4</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">5</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 提成详情模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="commissionDetailModal">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-xl font-bold">提成详情</h3>
+                <button class="text-gray-400 hover:text-gray-600" id="closeDetailModal">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex items-center mb-6">
+                    <img src="https://picsum.photos/id/1012/60/60" alt="张小明" class="w-16 h-16 rounded-full mr-4">
+                    <div>
+                        <h4 class="text-lg font-bold">张小明</h4>
+                        <p class="text-gray-500">销售一部 | 销售主管</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="p-4 border border-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-500 mb-1">计算周期</p>
+                        <p class="font-medium">2023年6月</p>
+                    </div>
+                    
+                    <div class="p-4 border border-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-500 mb-1">本月销售额</p>
+                        <p class="font-medium text-primary">¥185,200</p>
+                    </div>
+                    
+                    <div class="p-4 border border-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-500 mb-1">提成比例</p>
+                        <p class="font-medium">10%</p>
+                    </div>
+                    
+                    <div class="p-4 border border-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-500 mb-1">订单数量</p>
+                        <p class="font-medium">24 单</p>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-100 rounded-lg mb-6 overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b border-gray-100">
+                        <h5 class="font-medium">提成构成明细</h5>
+                    </div>
+                    
+                    <div class="p-4">
+                        <ul class="space-y-3">
+                            <li class="flex justify-between pb-3 border-b border-gray-100">
+                                <span class="text-gray-600">基础提成 (10%)</span>
+                                <span>¥16,520</span>
+                            </li>
+                            <li class="flex justify-between pb-3 border-b border-gray-100">
+                                <span class="text-gray-600">月度销售冠军奖励</span>
+                                <span class="text-success">+¥2,000</span>
+                            </li>
+                            <li class="flex justify-between pb-3 border-b border-gray-100">
+                                <span class="text-gray-600">新客户开发奖励 (3%)</span>
+                                <span class="text-success">+¥0</span>
+                            </li>
+                            <li class="flex justify-between font-bold text-lg">
+                                <span>应发提成总额</span>
+                                <span class="text-primary">¥18,520</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-100 rounded-lg mb-6 overflow-hidden">
+                    <div class="p-4 bg-gray-50 border-b border-gray-100">
+                        <h5 class="font-medium">相关订单明细</h5>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-100">
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">订单号</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">客户名称</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">金额</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">提成</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">日期</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100">
+                                    <td class="px-4 py-3 text-sm">ORD202306001</td>
+                                    <td class="px-4 py-3 text-sm">北京科技有限公司</td>
+                                    <td class="px-4 py-3 text-sm">¥25,000</td>
+                                    <td class="px-4 py-3 text-sm">¥2,500</td>
+                                    <td class="px-4 py-3 text-sm">2023-06-02</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="px-4 py-3 text-sm">ORD202306008</td>
+                                    <td class="px-4 py-3 text-sm">上海贸易公司</td>
+                                    <td class="px-4 py-3 text-sm">¥18,500</td>
+                                    <td class="px-4 py-3 text-sm">¥1,850</td>
+                                    <td class="px-4 py-3 text-sm">2023-06-05</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="px-4 py-3 text-sm">ORD202306015</td>
+                                    <td class="px-4 py-3 text-sm">广州实业集团</td>
+                                    <td class="px-4 py-3 text-sm">¥32,700</td>
+                                    <td class="px-4 py-3 text-sm">¥3,270</td>
+                                    <td class="px-4 py-3 text-sm">2023-06-10</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="p-4 text-center">
+                        <button class="text-primary hover:text-primary/80 text-sm">查看全部24条订单</button>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="px-6 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" id="closeDetailBtn">关闭</button>
+                    <button class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">标记为已发放</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能（移动端）
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('h-full');
+        });
+        
+        // 提成金额分布图表
+        const commissionCtx = document.getElementById('commissionChart').getContext('2d');
+        const commissionChart = new Chart(commissionCtx, {
+            type: 'bar',
+            data: {
+                labels: ['张小明', '李华', '王芳', '赵强', '刘强', '陈明', '杨丽', '吴杰'],
+                datasets: [{
+                    label: '提成金额',
+                    data: [18520, 16375, 13030, 11350, 8196, 7520, 6850, 5980],
+                    backgroundColor: '#165DFF',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '¥' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 提成详情模态框相关功能
+        const detailModal = document.getElementById('commissionDetailModal');
+        const closeDetailModal = document.getElementById('closeDetailModal');
+        const closeDetailBtn = document.getElementById('closeDetailBtn');
+        
+        // 打开详情模态框
+        document.querySelectorAll('.fa-eye').forEach(btn => {
+            btn.parentElement.addEventListener('click', function() {
+                detailModal.classList.remove('hidden');
+            });
+        });
+        
+        // 关闭详情模态框
+        function closeDetail() {
+            detailModal.classList.add('hidden');
+        }
+        
+        closeDetailModal.addEventListener('click', closeDetail);
+        closeDetailBtn.addEventListener('click', closeDetail);
+        
+        // 点击模态框外部关闭
+        detailModal.addEventListener('click', function(e) {
+            if (e.target === detailModal) {
+                closeDetail();
+            }
+        });
+        
+        // 重新计算按钮点击事件
+        document.getElementById('calculateBtn').addEventListener('click', function() {
+            // 显示加载状态
+            this.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i><span>计算中...</span>';
+            this.disabled = true;
+            
+            // 模拟计算过程
+            setTimeout(() => {
+                this.innerHTML = '<i class="fa fa-calculator"></i><span>重新计算</span>';
+                this.disabled = false;
+                alert('提成计算完成！');
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

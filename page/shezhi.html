@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汽车销售系统 - 管理模块</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E40AF', // 深蓝作为主色调，体现专业和信任感
+                        secondary: '#3B82F6', // 中蓝作为辅助色
+                        accent: '#60A5FA', // 亮蓝作为强调色
+                        success: '#10B981', // 成功色
+                        warning: '#F59E0B', // 警告色
+                        danger: '#EF4444', // 危险色
+                        dark: '#1F2937', // 深色文本
+                        'gray-light': '#F3F4F6', // 浅色背景
+                        'gray-medium': '#D1D5DB' // 中等灰色，用于边框等
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .sidebar-shadow {
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .nav-active {
+                @apply bg-primary/10 text-primary border-l-4 border-primary;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-light text-dark min-h-screen flex flex-col">
+    <div class="flex flex-1 overflow-hidden">
+      
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+           
+            
+            <!-- 页面内容 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- 管理模块概览 -->
+                <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                    <h3 class="text-lg font-bold mb-4"></h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 border border-gray-100 rounded-lg hover:border-primary/30 transition-all-300">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm text-gray-500">活跃用户</p>
+                                <i class="fa fa-users text-primary"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold">24</h4>
+                            <p class="text-xs text-gray-400 mt-1">包含5名管理员，19名普通用户</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg hover:border-primary/30 transition-all-300">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm text-gray-500">系统状态</p>
+                                <i class="fa fa-check-circle text-success"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold">正常</h4>
+                            <p class="text-xs text-gray-400 mt-1">最近备份：2023-06-15 02:00</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg hover:border-primary/30 transition-all-300">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm text-gray-500">今日操作日志</p>
+                                <i class="fa fa-file-text text-accent"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold">156</h4>
+                            <p class="text-xs text-gray-400 mt-1">包含8条重要操作记录</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg hover:border-primary/30 transition-all-300">
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-sm text-gray-500">存储空间</p>
+                                <i class="fa fa-hdd-o text-warning"></i>
+                            </div>
+                            <h4 class="text-2xl font-bold">68%</h4>
+                            <p class="text-xs text-gray-400 mt-1">总容量：500GB，已使用：340GB</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 用户权限管理 -->
+                <div id="user-permissions" class="bg-white rounded-xl p-6 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-lg font-bold flex items-center">
+                            <i class="fa fa-key text-primary mr-2"></i>
+                            用户权限管理
+                        </h3>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <div class="relative">
+                                <input type="text" placeholder="搜索用户..." class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full sm:w-64 text-sm">
+                                <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            
+                            <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all-300 text-sm flex items-center gap-1" onclick="window.location.href='table/guanliyuan.html'">
+                                <i class="fa fa-plus"></i>
+                                <span>新增用户</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">用户名</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">姓名</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">部门</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">角色</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">状态</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">最后登录</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-all-300">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1012/40/40" alt="admin" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">admin</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">管理员</td>
+                                    <td class="px-6 py-4 text-sm">系统管理部</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary">超级管理员</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">活跃</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">2023-06-18 09:45</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="编辑用户" onclick="window.location.href='table/guanliyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                      
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-all-300">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1027/40/40" alt="manager_zhang" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">manager_zhang</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">张明</td>
+                                    <td class="px-6 py-4 text-sm">销售部</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-secondary/10 text-secondary">部门经理</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">活跃</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">2023-06-18 08:30</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="编辑用户" onclick="window.location.href='table/guanliyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-all-300">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1025/40/40" alt="sales_li" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">sales_li</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">李华</td>
+                                    <td class="px-6 py-4 text-sm">销售部</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-700">销售顾问</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">活跃</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">2023-06-17 16:22</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="编辑用户" onclick="window.location.href='table/guanliyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                         
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-all-300">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1066/40/40" alt="inventory_wang" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">inventory_wang</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">王静</td>
+                                    <td class="px-6 py-4 text-sm">库存管理部</td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-700">库管员</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">未活跃</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">2023-06-15 10:15</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="编辑用户" onclick="window.location.href='table/guanliyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
+                        <div class="text-sm text-gray-500">
+                            显示 1 到 4 条，共 24 条记录
+                        </div>
+                        
+                        <div class="flex items-center space-x-1">
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i class="fa fa-angle-left"></i>
+                            </button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">2</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">3</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">4</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                    
+                  
+                  
+                    
+                  
+                
+             
+                 
+                    
+                </div>
+                
+                <!-- 数据备份与恢复 -->
+                
+            </div>
+        </main>
+    </div>
+    
+  
+    <script>
+        // 侧边栏切换功能（移动端）
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('h-full');
+        });
+        
+        // 系统设置标签页切换
+        document.querySelectorAll('#systemSettingsTabs button').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签的活跃状态
+                document.querySelectorAll('#systemSettingsTabs button').forEach(t => {
+                    t.classList.remove('border-primary', 'text-primary');
+                    t.classList.add('border-transparent', 'text-gray-500');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                
+                // 设置当前标签为活跃状态
+                tab.classList.remove('border-transparent', 'text-gray-500');
+                tab.classList.add('border-primary', 'text-primary');
+                tab.setAttribute('aria-selected', 'true');
+                
+                // 隐藏所有内容
+                document.querySelectorAll('.system-settings-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // 显示当前标签对应的内容
+                const targetId = tab.getAttribute('data-tabs-target');
+                document.querySelector(targetId).classList.remove('hidden');
+            });
+        });
+        
+        // 备份功能模拟
+        const backupModal = document.getElementById('backupModal');
+        const backupProgressBar = document.getElementById('backupProgressBar');
+        const backupProgressText = document.getElementById('backupProgressText');
+        const backupStatusText = document.getElementById('backupStatusText');
+        
+        document.getElementById('createBackupBtn').addEventListener('click', function() {
+            // 显示备份模态框
+            backupModal.classList.remove('hidden');
+            
+            // 重置进度
+            backupProgressBar.style.width = '0%';
+            backupProgressText.textContent = '0%';
+            backupStatusText.textContent = '准备开始备份...';
+            
+            // 模拟备份进度
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 备份完成
+                    backupStatusText.textContent = '备份已完成！';
+                    
+                    // 2秒后关闭模态框
+                    setTimeout(() => {
+                        backupModal.classList.add('hidden');
+                        alert('数据备份已成功创建！');
+                    }, 2000);
+                } else {
+                    // 更新进度状态文本
+                    if (progress < 30) {
+                        backupStatusText.textContent = '正在准备数据...';
+                    } else if (progress < 70) {
+                        backupStatusText.textContent = '正在备份数据...';
+                    } else {
+                        backupStatusText.textContent = '正在验证备份...';
+                    }
+                }
+                
+                // 更新进度条和文本
+                backupProgressBar.style.width = `${progress}%`;
+                backupProgressText.textContent = `${Math.round(progress)}%`;
+            }, 500);
+        });
+        
+        // 点击模态框外部关闭
+        backupModal.addEventListener('click', function(e) {
+            if (e.target === backupModal) {
+                // 防止在备份过程中关闭
+                // backupModal.classList.add('hidden');
+            }
+        });
+        
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 在移动设备上点击导航后关闭侧边栏
+                    const sidebar = document.getElementById('sidebar');
+                    if (window.innerWidth < 768 && !sidebar.classList.contains('hidden')) {
+                        sidebar.classList.add('hidden');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+    

@@ -1,0 +1,133 @@
+{
+	"clearInfo": {
+		"clearUrl": "api/clear.json"
+	},
+	"homeInfo": {
+		"title": "首页",
+		"icon": "fa fa-home",
+		"href": "page/welcome-3.html?t=1"
+	},
+	"logoInfo": {
+		"title": "汽车销售管理",
+		"image": "images/favicon.ico",
+		"href": ""
+	},
+	"menuInfo": {
+		"currency": {
+			"title": "常规管理",
+			"icon": "fa fa-address-book",
+			"child": [{
+					"title": "首页",
+					"icon": "fa fa-home",
+					"href": "page/welcome-3.html?t=1",
+					"target": "_self"
+				},
+				{
+					"title": "客户管理",
+					"icon": "fa fa-users",
+					"href": "page/table.html",
+					"target": "_self"
+				},
+				{
+					"title": "销售订单管理",
+					"icon": "fa fa-folder-o",
+					"href": "",
+					"target": "_self",
+					"child": [{
+							"title": "完成订单",
+							"icon": "fa fa-check-square-o",
+							"href": "page/table2.html",
+							"target": "_self"
+
+						},
+						{
+							"title": "客服入款",
+							"icon": "fa fa-credit-card",
+							"href": "page/form-step.html",
+							"target": "_self"
+						}
+					]
+				},
+				{
+					"title": "车辆库存管理",
+					"href": "",
+					"icon": "fa fa-automobile",
+					"target": "_self",
+					"child": [{
+							"title": "车辆库存表",
+							"icon": "fa fa-newspaper-o",
+							"href": "page/cheliangkucun.html",
+							"target": "_self"
+						},
+						{
+							"title": "车辆入库",
+							"icon": "fa fa-plus-square",
+							"href": "page/ruku.html",
+							"target": "_self"
+						}
+					]
+				},
+
+
+
+				{
+					"title": "销售人员管理",
+					"href": "",
+					"icon": "fa fa-clipboard",
+					"target": "_self",
+					"child": [{
+							"title": "销售管理表",
+
+							"href": "page/xiaoshouguanli.html",
+							"icon": "fa fa-sort-amount-desc",
+							"target": "_self"
+						},
+						{
+							"title": "销售业绩",
+							"icon": "fa fa-jpy",
+							"href": "page/yeji.html",
+							"target": "_self"
+						},
+						{
+							"title": "提成计算",
+							"icon": "fa fa-money",
+							"href": "page/jisuan.html",
+							"target": "_self"
+						}
+					]
+				},
+				{
+					"title": "销售分析",
+					"href": "page/xiaoshoufenxi.html",
+					"icon": "fa fa-sort-amount-desc",
+					"target": "_self"
+
+				},
+				{
+					"title": "系统设置",
+					"href": "",
+					"icon": "fa fa-gears",
+					"target": "_self",
+					"child": [{
+							"title": "系统管理",
+							"icon": "fa fa-calendar",
+							"href": "page/shezhi.html",
+							"target": "_self"
+						},
+						{
+							"title": "系统参数",
+							"icon": "fa fa-asterisk",
+							"href": "page/canshu.html",
+							"target": "_self"
+						}
+
+					]
+				}
+
+
+			]
+		}
+		
+		
+	}
+}

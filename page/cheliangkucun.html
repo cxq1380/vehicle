@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>车辆库存管理表</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/layui-src@2.5.5/dist/css/layui.css">
+    <script src="https://cdn.jsdelivr.net/npm/layui-src@2.5.5/dist/layui.js"></script>
+    <style>
+        .container { padding: 20px; }
+        .search-bar { margin-bottom: 15px; display: flex; gap: 10px; }
+        .status-enough { color: #009688; } /* 库存充足 */
+        .status-low { color: #FF9800; }    /* 库存偏低 */
+        .status-empty { color: #F44336; }  /* 库存缺货 */
+	
+		/* 插入到样式表中 */
+		.fake-pagination {
+		    margin: 20px 0;
+		    text-align: center;
+		    font-size: 14px;
+		}
+		.page-btn {
+		    display: inline-block;
+		    width: 32px;
+		    height: 32px;
+		    line-height: 32px;
+		    margin: 0 3px;
+		    border: 1px solid #ddd;
+		    border-radius: 4px;
+		    background: #fff;
+		    cursor: default; /* 去除点击效果 */
+		}
+		.page-btn.active {
+		    background: #009688;
+		    color: #fff;
+		    border-color: #009688;
+		}
+		.page-btn.prev, .page-btn.next {
+		    width: auto;
+		    padding: 0 10px;
+		}
+		.page-ellipsis {
+		    margin: 0 5px;
+		    color: #666;
+		}
+		.page-info {
+		    margin-left: 10px;
+		    color: #666;
+		}
+		
+    </style>
+</head>
+<body>
+    <div class="layui-container container">
+        <fieldset class="layui-elem-field">
+            <legend>车辆库存表</legend>
+            <div class="layui-field-box">
+                <!-- 搜索区 -->
+                <div class="search-bar">
+                    <div class="layui-input-inline">
+                        <input type="text" id="search" placeholder="搜索品牌/车型" class="layui-input">
+                    </div>
+                    <button class="layui-btn" id="searchBtn">搜索</button>
+                    <button class="layui-btn layui-btn-primary" id="resetBtn">重置</button>
+                </div>
+				      
+
+                <!-- 表格 -->
+                <table class="layui-table" lay-filter="carTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>品牌</th>
+                            <th>车型</th>
+                            <th>颜色</th>
+                            <th>库存数量</th>
+                            <th>库存状态</th>
+                            <th>入库日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="carTableBody">
+                        <!-- 数据将通过JSON动态渲染 -->
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+    </div>
+	      
+<div class="fake-pagination">
+    <button class="page-btn prev">上一页</button>
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <span class="page-ellipsis">...</span>
+    <button class="page-btn">8</button>
+    <button class="page-btn next">下一页</button>
+    <span class="page-info">共 8 页 156 条</span>
+</div>
+    <script>
+		
+        // 1. 车辆库存数据（单独的JSON格式）
+        const carInventoryJSON = [
+            {
+                     "id": 1,
+                              "brand": "宝马",
+                              "model": "X5 30i 领先型",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "矿石白",
+                              "stock": 18,
+                              "storageDate": "2024-01-15",
+                              "warehouse": "A区-01库"
+                          },
+                          {
+                              "id": 2,
+                              "brand": "奔驰",
+                              "model": "GLC 260 L 豪华型",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "曜石黑",
+                              "stock": 7,
+                              "storageDate": "2024-02-20",
+                              "warehouse": "B区-03库"
+                          },
+                          {
+                              "id": 3,
+                              "brand": "特斯拉",
+                              "model": "Model 3 后轮驱动版",
+                              "type": "轿车",
+                              "power": "纯电",
+                              "color": "珍珠白",
+                              "stock": 0,
+                              "storageDate": "2024-01-05",
+                              "warehouse": "C区-02库"
+                          },
+                          {
+                              "id": 4,
+                              "brand": "比亚迪",
+                              "model": "汉EV 创世版",
+                              "type": "轿车",
+                              "power": "纯电",
+                              "color": "赤帝红",
+                              "stock": 25,
+                              "storageDate": "2024-03-10",
+                              "warehouse": "A区-05库"
+                          },
+                          {
+                              "id": 5,
+                              "brand": "奥迪",
+                              "model": "A6L 45 TFSI 尊享型",
+                              "type": "轿车",
+                              "power": "燃油",
+                              "color": "天云灰",
+                              "stock": 5,
+                              "storageDate": "2024-02-18",
+                              "warehouse": "B区-01库"
+                          },
+                          {
+                              "id": 6,
+                              "brand": "大众",
+                              "model": "途观L 380TSI 四驱R-Line",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "冰岛银",
+                              "stock": 12,
+                              "storageDate": "2024-03-05",
+                              "warehouse": "C区-04库"
+                          },
+                          {
+                              "id": 7,
+                              "brand": "丰田",
+                              "model": "凯美瑞 2.5G 豪华版",
+                              "type": "轿车",
+                              "power": "燃油",
+                              "color": "欧泊银",
+                              "stock": 9,
+                              "storageDate": "2024-01-20",
+                              "warehouse": "A区-02库"
+                          },
+                          {
+                              "id": 8,
+                              "brand": "蔚来",
+                              "model": "ES6 运动版",
+                              "type": "SUV",
+                              "power": "纯电",
+                              "color": "深空黑",
+                              "stock": 3,
+                              "storageDate": "2024-02-10",
+                              "warehouse": "B区-06库"
+                          },
+                          {
+                              "id": 9,
+                              "brand": "本田",
+                              "model": "CR-V 锐·混动 2.0L 两驱净速版",
+                              "type": "SUV",
+                              "power": "混动",
+                              "color": "晶耀白",
+                              "stock": 15,
+                              "storageDate": "2024-03-12",
+                              "warehouse": "C区-01库"
+                          },
+                          {
+                              "id": 10,
+                              "brand": "小鹏",
+                              "model": "P7i 702Max",
+                              "type": "轿车",
+                              "power": "纯电",
+                              "color": "星慕白",
+                              "stock": 6,
+                              "storageDate": "2024-02-25",
+                              "warehouse": "A区-07库"
+                          },
+                          {
+                              "id": 11,
+                              "brand": "理想",
+                              "model": "L8 Max",
+                              "type": "SUV",
+                              "power": "增程式",
+                              "color": "baby蓝",
+                              "stock": 4,
+                              "storageDate": "2024-03-08",
+                              "warehouse": "B区-05库"
+                          },
+                          {
+                              "id": 12,
+                              "brand": "马自达",
+                              "model": "CX-5 2.5L 两驱智尊型",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "魂动红",
+                              "stock": 2,
+                              "storageDate": "2024-01-30",
+                              "warehouse": "C区-03库"
+                          },
+                          {
+                              "id": 13,
+                              "brand": "雪佛兰",
+                              "model": "探界者 Redline 550T 四驱拓界版",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "火山红",
+                              "stock": 8,
+                              "storageDate": "2024-02-05",
+                              "warehouse": "A区-04库"
+                          },
+                          {
+                              "id": 14,
+                              "brand": "吉利",
+                              "model": "星越L 2.0T 两驱尊贵型",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "翠羽蓝",
+                              "stock": 20,
+                              "storageDate": "2024-03-15",
+                              "warehouse": "B区-02库"
+                          },
+                          {
+                              "id": 15,
+                              "brand": "哈弗",
+                              "model": "H6 第三代 1.5T 两驱Max版",
+                              "type": "SUV",
+                              "power": "燃油",
+                              "color": "星云灰",
+                              "stock": 28,
+                              "storageDate": "2024-02-12",
+                              "warehouse": "C区-06库"
+                          }
+        ];
+
+        // 2. 初始化页面
+        layui.use(['jquery', 'layer'], function() {
+            const $ = layui.jquery;
+            const layer = layui.layer;
+
+            // 3. 渲染表格（从JSON加载数据）
+            function renderTable(data) {
+                const tableBody = $('#carTableBody');
+                tableBody.empty(); // 清空表格
+
+                // 遍历JSON数据，生成表格行
+                data.forEach(item => {
+                    // 计算库存状态
+                    let statusClass = 'status-enough';
+                    let statusText = '充足';
+                    if (item.stock === 0) {
+                        statusClass = 'status-empty';
+                        statusText = '缺货';
+                    } else if (item.stock <= 10) {
+                        statusClass = 'status-low';
+                        statusText = '偏低';
+                    }
+
+                    // 生成行HTML
+                    const row = `
+                        <tr>
+                            <td>${item.id}</td>
+                            <td>${item.brand}</td>
+                            <td>${item.model}</td>
+                            <td>${item.color}</td>
+                            <td>${item.stock}</td>
+                            <td><span class="${statusClass}">${statusText}</span></td>
+                            <td>${item.storageDate}</td>
+                            <td>
+                                <button class="layui-btn layui-btn-xs" onclick="editCar(${item.id})">编辑</button>
+                                <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="deleteCar(${item.id})">删除</button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            }
+
+            // 4. 初始渲染（加载全部JSON数据）
+            renderTable(carInventoryJSON);
+
+            // 5. 搜索功能
+            $('#searchBtn').click(function() {
+                const keyword = $('#search').val().toLowerCase();
+                // 从JSON中筛选数据
+                const filteredData = carInventoryJSON.filter(item => 
+                    item.brand.toLowerCase().includes(keyword) || 
+                    item.model.toLowerCase().includes(keyword)
+                );
+                renderTable(filteredData);
+
+                if (filteredData.length === 0) {
+                    layer.msg('未找到匹配的车辆信息', {icon: 2});
+                }
+            });
+
+            // 6. 重置功能
+            $('#resetBtn').click(function() {
+                $('#search').val('');
+                renderTable(carInventoryJSON); // 重新加载全部JSON数据
+            });
+        });
+
+        // 7. 编辑功能（实际项目中可对接接口）
+        function editCar(id) {
+            // 从JSON中查找对应数据
+            const car = carInventoryJSON.find(item => item.id === id);
+            layui.use('layer', function() {
+                layui.layer.alert(`编辑车辆：\nID: ${car.id}\n品牌: ${car.brand}\n车型: ${car.model}`, {title: '编辑库存'});
+            });
+        }
+
+        // 8. 删除功能
+        function deleteCar(id) {
+            layui.use('layer', function() {
+                layui.layer.confirm('确定要删除这条数据吗？', {icon: 3}, function(index) {
+                    // 实际项目中可调用接口删除JSON数据
+                    layui.layer.close(index);
+                    layui.layer.msg('删除成功（JSON数据已更新）', {icon: 1});
+                    // 重新渲染表格（模拟删除效果）
+                    const remainingData = carInventoryJSON.filter(item => item.id !== id);
+                    layui.use('jquery', function() {
+                        const $ = layui.jquery;
+                        const tableBody = $('#carTableBody');
+                        tableBody.empty();
+                        remainingData.forEach(item => {
+                            // 简化渲染逻辑（与上面一致）
+                            let statusClass = item.stock > 10 ? 'status-enough' : (item.stock > 0 ? 'status-low' : 'status-empty');
+                            let statusText = item.stock > 10 ? '充足' : (item.stock > 0 ? '偏低' : '缺货');
+                            tableBody.append(`
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.brand}</td>
+                                    <td>${item.model}</td>
+                                    <td>${item.color}</td>
+                                    <td>${item.stock}</td>
+                                    <td><span class="${statusClass}">${statusText}</span></td>
+                                    <td>${item.storageDate}</td>
+                                    <td>
+                                        <button class="layui-btn layui-btn-xs" onclick="editCar(${item.id})">编辑</button>
+                                        <button class="layui-btn layui-btn-xs layui-btn-danger" onclick="deleteCar(${item.id})">删除</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>

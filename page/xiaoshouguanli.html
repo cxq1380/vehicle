@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售顾问管理系统 - 销售顾问信息维护</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        info: '#1890FF',
+                        dark: '#1D2129',
+                        'gray-light': '#F2F3F5',
+                        'gray-medium': '#C9CDD4'
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .sidebar-shadow {
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            }
+            .transition-bg {
+                transition: background-color 0.2s ease;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-light text-dark min-h-screen flex flex-col">
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 侧边栏导航 -->
+        
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            
+            
+            <!-- 页面内容 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- 操作栏 -->
+                <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="relative">
+                                <input type="text" placeholder="搜索销售顾问..." class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary w-full sm:w-64">
+                                <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <select class="border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                    <option>全部部门</option>
+                                    <option>销售一部</option>
+                                    <option>销售二部</option>
+                                    <option>销售三部</option>
+                                </select>
+                                
+                                <select class="border border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                    <option>全部状态</option>
+                                    <option>在职</option>
+                                    <option>离职</option>
+                                    <option>休假</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg transition-colors flex items-center justify-center gap-2" id="addConsultantBtn" onclick="window.location.href='table/xiaoshouyuan.html'">
+                            <i class="fa fa-plus"></i>
+                            <span>添加销售顾问</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 销售顾问列表 -->
+                <div class="bg-white rounded-xl card-shadow overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">ID</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">姓名</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">部门</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">职位</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">入职日期</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">联系电话</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">状态</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm">SC001</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1012/40/40" alt="张小明" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">张小明</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售一部</td>
+                                    <td class="px-6 py-4 text-sm">销售主管</td>
+                                    <td class="px-6 py-4 text-sm">2020-03-15</td>
+                                    <td class="px-6 py-4 text-sm">138****5678</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">在职</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-info hover:text-info/80" title="编辑" onclick="window.location.href='table/xiaoshouyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button class="text-danger hover:text-danger/80" title="删除">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm">SC002</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1027/40/40" alt="李华" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">李华</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售二部</td>
+                                    <td class="px-6 py-4 text-sm">高级销售顾问</td>
+                                    <td class="px-6 py-4 text-sm">2021-05-22</td>
+                                    <td class="px-6 py-4 text-sm">139****8765</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">在职</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-info hover:text-info/80" title="编辑" onclick="window.location.href='table/xiaoshouyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button class="text-danger hover:text-danger/80" title="删除">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm">SC003</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1025/40/40" alt="王芳" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">王芳</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售一部</td>
+                                    <td class="px-6 py-4 text-sm">销售顾问</td>
+                                    <td class="px-6 py-4 text-sm">2022-01-10</td>
+                                    <td class="px-6 py-4 text-sm">137****6543</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-warning/10 text-warning">休假</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-info hover:text-info/80" title="编辑" onclick="window.location.href='table/xiaoshouyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button class="text-danger hover:text-danger/80" title="删除">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm">SC004</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1074/40/40" alt="赵强" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">赵强</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售三部</td>
+                                    <td class="px-6 py-4 text-sm">销售顾问</td>
+                                    <td class="px-6 py-4 text-sm">2022-06-05</td>
+                                    <td class="px-6 py-4 text-sm">136****4321</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-success/10 text-success">在职</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-info hover:text-info/80" title="编辑" onclick="window.location.href='table/xiaoshouyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button class="text-danger hover:text-danger/80" title="删除">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm">SC005</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1062/40/40" alt="陈静" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">陈静</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售二部</td>
+                                    <td class="px-6 py-4 text-sm">销售顾问</td>
+                                    <td class="px-6 py-4 text-sm">2023-02-18</td>
+                                    <td class="px-6 py-4 text-sm">135****2109</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs rounded-full bg-danger/10 text-danger">离职</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary/80" title="查看详情">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
+                                            <button class="text-info hover:text-info/80" title="编辑" onclick="window.location.href='table/xiaoshouyuan.html'">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                            <button class="text-danger hover:text-danger/80" title="删除">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="text-sm text-gray-500">
+                            显示 1 到 5 条，共 24 条记录
+                        </div>
+                        
+                        <div class="flex items-center space-x-1">
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i class="fa fa-angle-left"></i>
+                            </button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">2</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">3</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">4</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">5</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 添加/编辑销售顾问模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="consultantModal">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="text-xl font-bold" id="modalTitle">添加销售顾问</h3>
+                <button class="text-gray-400 hover:text-gray-600" id="closeModal">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <form id="consultantForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">姓名 <span class="text-danger">*</span></label>
+                            <input type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">性别 <span class="text-danger">*</span></label>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="gender" value="male" class="text-primary focus:ring-primary" checked>
+                                    <span class="ml-2">男</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="gender" value="female" class="text-primary focus:ring-primary">
+                                    <span class="ml-2">女</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">联系电话 <span class="text-danger">*</span></label>
+                            <input type="tel" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">电子邮箱</label>
+                            <input type="email" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">所属部门 <span class="text-danger">*</span></label>
+                            <select class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required>
+                                <option value="">请选择部门</option>
+                                <option value="1">销售一部</option>
+                                <option value="2">销售二部</option>
+                                <option value="3">销售三部</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">职位 <span class="text-danger">*</span></label>
+                            <select class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required>
+                                <option value="">请选择职位</option>
+                                <option value="1">销售主管</option>
+                                <option value="2">高级销售顾问</option>
+                                <option value="3">销售顾问</option>
+                                <option value="4">实习销售顾问</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">入职日期 <span class="text-danger">*</span></label>
+                            <input type="date" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">状态 <span class="text-danger">*</span></label>
+                            <select class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" required>
+                                <option value="1">在职</option>
+                                <option value="2">离职</option>
+                                <option value="3">休假</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">备注信息</label>
+                        <textarea rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" class="px-6 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" id="cancelBtn">取消</button>
+                        <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能（移动端）
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('h-full');
+        });
+        
+        // 模态框相关功能
+        const modal = document.getElementById('consultantModal');
+        const addBtn = document.getElementById('addConsultantBtn');
+        const closeBtn = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const modalTitle = document.getElementById('modalTitle');
+        const form = document.getElementById('consultantForm');
+        
+        // 打开模态框（添加）
+        addBtn.addEventListener('click', function() {
+            modalTitle.textContent = '添加销售顾问';
+            modal.classList.remove('hidden');
+            // 重置表单
+            form.reset();
+        });
+        
+        // 关闭模态框
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+        
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        
+        // 点击模态框外部关闭
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        // 表单提交处理
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // 这里可以添加表单验证和提交逻辑
+            alert('销售顾问信息已保存！');
+            closeModal();
+        });
+        
+        // 编辑按钮点击事件（模拟）
+        document.querySelectorAll('.fa-edit').forEach(btn => {
+            btn.parentElement.addEventListener('click', function() {
+                modalTitle.textContent = '编辑销售顾问';
+                modal.classList.remove('hidden');
+                // 这里可以添加填充表单数据的逻辑
+            });
+        });
+        
+        // 删除按钮点击事件（模拟）
+        document.querySelectorAll('.fa-trash').forEach(btn => {
+            btn.parentElement.addEventListener('click', function() {
+                if (confirm('确定要删除该销售顾问吗？此操作不可撤销。')) {
+                    alert('销售顾问已删除！');
+                    // 这里可以添加删除逻辑
+                }
+            });
+        });
+    </script>
+</body>
+</html>

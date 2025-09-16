@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售顾问管理系统 - 业绩统计</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#FF4D4F',
+                        info: '#1890FF',
+                        dark: '#1D2129',
+                        'gray-light': '#F2F3F5',
+                        'gray-medium': '#C9CDD4'
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .sidebar-shadow {
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            }
+            .transition-bg {
+                transition: background-color 0.2s ease;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-light text-dark min-h-screen flex flex-col">
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 侧边栏导航 -->
+      
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white h-16 flex items-center justify-between px-6 shadow-sm z-10">
+                <div class="flex items-center">
+                    <button class="md:hidden mr-4 text-gray-500" id="sidebarToggle">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold">销售业绩统计</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <button class="text-gray-500 hover:text-primary transition-colors">
+                            <i class="fa fa-bell text-xl"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-danger rounded-full text-white text-xs flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- 筛选和统计卡片 -->
+                <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-lg font-bold">业绩统计筛选</h3>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <div class="flex items-center">
+                                <label class="text-sm text-gray-600 mr-2">时间范围:</label>
+                                <select class="border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white text-sm">
+                                    <option>本月</option>
+                                    <option>上月</option>
+                                    <option>本季度</option>
+                                    <option>上季度</option>
+                                    <option>本年</option>
+                                    <option>自定义</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <label class="text-sm text-gray-600 mr-2">部门:</label>
+                                <select class="border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white text-sm">
+                                    <option>全部部门</option>
+                                    <option>销售一部</option>
+                                    <option>销售二部</option>
+                                    <option>销售三部</option>
+                                </select>
+                            </div>
+                            
+                            <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1">
+                                <i class="fa fa-refresh"></i>
+                                <span>刷新数据</span>
+                            </button>
+                            
+                            <button class="border border-gray-200 hover:bg-gray-50 text-gray-600 px-4 py-2 rounded-lg transition-colors text-sm flex items-center gap-1">
+                                <i class="fa fa-download"></i>
+                                <span>导出报表</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 业绩概览卡片 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">总销售额</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">¥1,258,450</h4>
+                                <span class="text-success text-sm flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 12.3%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">较上月增长 ¥138,240</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">成交订单数</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">156</h4>
+                                <span class="text-success text-sm flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 8.5%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">较上月增长 12 单</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">平均客单价</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">¥8,067</h4>
+                                <span class="text-success text-sm flex items-center">
+                                    <i class="fa fa-arrow-up mr-1"></i> 3.6%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">较上月增长 ¥282</p>
+                        </div>
+                        
+                        <div class="p-4 border border-gray-100 rounded-lg">
+                            <p class="text-sm text-gray-500 mb-1">客户转化率</p>
+                            <div class="flex items-end justify-between">
+                                <h4 class="text-2xl font-bold">24.8%</h4>
+                                <span class="text-danger text-sm flex items-center">
+                                    <i class="fa fa-arrow-down mr-1"></i> 1.2%
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-2">较上月下降 0.3 个百分点</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 图表区域 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-xl p-6 card-shadow lg:col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg">部门销售业绩对比</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-sm bg-primary text-white rounded-md">月度</button>
+                                <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md transition-colors">季度</button>
+                                <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-100 rounded-md transition-colors">年度</button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h3 class="font-bold text-lg mb-6">业绩构成分析</h3>
+                        <div class="h-80 flex items-center justify-center">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 销售顾问业绩排名 -->
+                <div class="bg-white rounded-xl card-shadow overflow-hidden mb-6">
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                        <h3 class="font-bold text-lg">销售顾问业绩排名</h3>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <span>排序方式:</span>
+                            <select class="border-none bg-transparent focus:outline-none focus:ring-0 ml-2 text-primary font-medium">
+                                <option>本月销售额 ↓</option>
+                                <option>本月订单数 ↓</option>
+                                <option>同比增长率 ↓</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">排名</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">销售顾问</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">部门</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">本月销售额</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">本月订单数</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">同比增长</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">目标完成率</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-primary text-white text-sm font-bold">1</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1012/40/40" alt="张小明" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">张小明</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售一部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥185,200</td>
+                                    <td class="px-6 py-4 text-sm">24</td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+15.2%</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-32 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-success rounded-full" style="width: 125%"></div>
+                                            </div>
+                                            <span class="text-sm font-medium">125%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 text-dark text-sm font-bold">2</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1027/40/40" alt="李华" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">李华</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售二部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥168,750</td>
+                                    <td class="px-6 py-4 text-sm">21</td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+8.7%</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-32 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-success rounded-full" style="width: 112%"></div>
+                                            </div>
+                                            <span class="text-sm font-medium">112%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-warning text-dark text-sm font-bold">3</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1025/40/40" alt="王芳" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">王芳</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售一部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥142,300</td>
+                                    <td class="px-6 py-4 text-sm">18</td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-danger text-sm">-2.1%</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-32 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-warning rounded-full" style="width: 95%"></div>
+                                            </div>
+                                            <span class="text-sm font-medium">95%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 text-dark text-sm font-bold">4</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1074/40/40" alt="赵强" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">赵强</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售三部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥128,500</td>
+                                    <td class="px-6 py-4 text-sm">16</td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+5.3%</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-32 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-success rounded-full" style="width: 85%"></div>
+                                            </div>
+                                            <span class="text-sm font-medium">85%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4">
+                                        <span class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-300 text-dark text-sm font-bold">5</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <img src="https://picsum.photos/id/1066/40/40" alt="刘强" class="w-8 h-8 rounded-full mr-3">
+                                            <span class="text-sm">刘强</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm">销售三部</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥112,800</td>
+                                    <td class="px-6 py-4 text-sm">15</td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+3.8%</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-32 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-warning rounded-full" style="width: 75%"></div>
+                                            </div>
+                                            <span class="text-sm font-medium">75%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 分页 -->
+                    <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="text-sm text-gray-500">
+                            显示 1 到 5 条，共 24 条记录
+                        </div>
+                        
+                        <div class="flex items-center space-x-1">
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                <i class="fa fa-angle-left"></i>
+                            </button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded bg-primary text-white">1</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">2</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">3</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">4</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 hover:border-primary hover:text-primary">5</button>
+                            <button class="w-9 h-9 flex items-center justify-center rounded border border-gray-200 text-gray-500 hover:border-primary hover:text-primary">
+                                <i class="fa fa-angle-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 产品销售分析 -->
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-lg">产品销售分析</h3>
+                        <button class="text-primary hover:text-primary/80 text-sm flex items-center">
+                            <span>查看全部</span>
+                            <i class="fa fa-angle-right ml-1"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200">
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">产品名称</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">本月销量</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">销售额</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">占比</th>
+                                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">同比增长</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm font-medium">智能办公系统</td>
+                                    <td class="px-6 py-4 text-sm">32</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥480,000</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-24 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-primary rounded-full" style="width: 38%"></div>
+                                            </div>
+                                            <span class="text-sm">38%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+18.5%</span>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm font-medium">客户管理软件</td>
+                                    <td class="px-6 py-4 text-sm">45</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥337,500</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-24 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-info rounded-full" style="width: 27%"></div>
+                                            </div>
+                                            <span class="text-sm">27%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+12.3%</span>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm font-medium">数据分析工具</td>
+                                    <td class="px-6 py-4 text-sm">28</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥224,000</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-24 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-success rounded-full" style="width: 18%"></div>
+                                            </div>
+                                            <span class="text-sm">18%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-danger text-sm">-3.2%</span>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition-bg">
+                                    <td class="px-6 py-4 text-sm font-medium">营销自动化平台</td>
+                                    <td class="px-6 py-4 text-sm">21</td>
+                                    <td class="px-6 py-4 text-sm font-medium">¥217,000</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="w-24 h-2 bg-gray-100 rounded-full mr-2">
+                                                <div class="h-full bg-warning rounded-full" style="width: 17%"></div>
+                                            </div>
+                                            <span class="text-sm">17%</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-success text-sm">+5.7%</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能（移动端）
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('h-full');
+        });
+        
+        // 部门销售业绩对比图表
+        const departmentCtx = document.getElementById('departmentChart').getContext('2d');
+        const departmentChart = new Chart(departmentCtx, {
+            type: 'bar',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                datasets: [
+                    {
+                        label: '销售一部',
+                        data: [320000, 350000, 380000, 360000, 410000, 430000, 450000, 440000, 460000, 480000, 520000, 485000],
+                        backgroundColor: '#165DFF',
+                        borderRadius: 4
+                    },
+                    {
+                        label: '销售二部',
+                        data: [280000, 300000, 320000, 310000, 340000, 360000, 380000, 370000, 390000, 410000, 440000, 425000],
+                        backgroundColor: '#1890FF',
+                        borderRadius: 4
+                    },
+                    {
+                        label: '销售三部',
+                        data: [250000, 270000, 290000, 280000, 310000, 330000, 350000, 340000, 360000, 380000, 410000, 348450],
+                        backgroundColor: '#36CFC9',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '¥' + (value / 10000) + '万';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 业绩构成分析图表
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(performanceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['智能办公系统', '客户管理软件', '数据分析工具', '营销自动化平台'],
+                datasets: [{
+                    data: [38, 27, 18, 17],
+                    backgroundColor: [
+                        '#165DFF',
+                        '#1890FF',
+                        '#52C41A',
+                        '#FAAD14'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    </script>
+</body>
+</html>

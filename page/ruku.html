@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>车辆入库表单</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/layui-src@2.5.5/dist/css/layui.css">
+	<script src="https://cdn.jsdelivr.net/npm/layui-src@2.5.5/dist/layui.js"></script>
+    <style>
+        .form-container {
+            width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .form-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .layui-form-item {
+            margin-bottom: 15px;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .layui-btn {
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+	<script>
+		  layui.use('form', function(){
+		            var form = layui.form;
+		            // 渲染表单（核心步骤，没有这行下拉框不显示）
+		            form.render();
+		            
+		            // （可选）如果后续需要给按钮加点击事件，也可以在这里写
+		            // 例如：保存按钮的逻辑
+		            // document.querySelector('.layui-btn:not(.layui-btn-primary)').addEventListener('click', function(){
+		            //     layer.msg('保存逻辑待实现');
+		            // });
+		        });
+	</script>
+    <div class="form-container">
+        <div class="form-title">车辆入库信息登记</div>
+        
+        <form class="layui-form" lay-filter="inboundForm">
+            <!-- 车辆基本信息 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">品牌</label>
+                <div class="layui-input-block">
+                    <select>
+                        <option value="">请选择品牌</option>
+                        <option value="bmw">宝马</option>
+                        <option value="benz">奔驰</option>
+                        <option value="toyota">丰田</option>
+                        <option value="byd">比亚迪</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">车型</label>
+                <div class="layui-input-block">
+                    <input type="text" placeholder="例如：X5 30i 领先型" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">车辆识别码(VIN)</label>
+                <div class="layui-input-block">
+                    <input type="text" placeholder="17位车辆识别码" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">颜色</label>
+                <div class="layui-input-block">
+                    <input type="text" placeholder="例如：矿石白、曜石黑" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">动力类型</label>
+                <div class="layui-input-block">
+                    <select>
+                        <option value="">请选择动力类型</option>
+                        <option value="fuel">燃油</option>
+                        <option value="electric">纯电</option>
+                        <option value="hybrid">混动</option>
+                        <option value="plugin">插电混动</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 入库信息 -->
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库日期</label>
+                <div class="layui-input-block">
+                    <input type="date" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库数量</label>
+                <div class="layui-input-block">
+                    <input type="number" value="1" min="1" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">仓库位置</label>
+                <div class="layui-input-block">
+                    <select>
+                        <option value="">请选择仓库</option>
+                        <option value="A1">A区-1号库</option>
+                        <option value="A2">A区-2号库</option>
+                        <option value="B1">B区-1号库</option>
+                        <option value="B2">B区-2号库</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库操作员</label>
+                <div class="layui-input-block">
+                    <input type="text" placeholder="操作员姓名" class="layui-input">
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注说明</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="例如：车辆外观检查情况、特殊注意事项等" class="layui-textarea" rows="3"></textarea>
+                </div>
+            </div>
+            
+            <!-- 操作按钮 -->
+            <div class="form-actions">
+                <button type="button" class="layui-btn layui-btn-primary">取消</button>
+                <button type="button" class="layui-btn">保存入库信息</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 引入Layui仅用于样式渲染，无实际功能 -->
+    <script src="https://cdn.jsdelivr.net/npm/layui-src@2.5.5/dist/layui.js"></script>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车辆管理系统 - 销售分析模块</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#722ED1',
+                        success: '#52C41A',
+                        warning: '#FAAD14',
+                        danger: '#F5222D',
+                        dark: '#1D2129',
+                        'light-bg': '#F2F3F5'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px rgba(22, 93, 255, 0.1);
+            }
+            .sidebar-active {
+                @apply bg-primary/10 text-primary border-l-4 border-primary;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, #165DFF 0%, #0A4BDB 100%);
+            }
+        }
+    </style>
+</head>
+<body class="bg-light-bg font-inter text-dark min-h-screen flex flex-col">
+    <div class="flex flex-1 overflow-hidden">
+    
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white h-16 flex items-center justify-between px-6 shadow-sm z-10">
+                <div class="flex items-center">
+                    <button class="md:hidden mr-4 text-gray-500" id="sidebarToggle">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-lg font-semibold">销售分析</h2>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    
+                    
+                    
+                </div>
+            </header>
+            
+            <!-- 页面内容 -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <!-- 筛选器和时间选择 -->
+                <div class="bg-white rounded-xl p-5 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex flex-wrap gap-3">
+                            <div class="relative">
+                                <select class="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                    <option>全部车型</option>
+                                    <option>轿车</option>
+                                    <option>SUV</option>
+                                    <option>MPV</option>
+                                    <option>新能源</option>
+                                </select>
+                                <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                            
+                            <div class="relative">
+                                <select class="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                    <option>全部销售顾问</option>
+                                    <option>李销售</option>
+                                    <option>王销售</option>
+                                    <option>张销售</option>
+                                    <option>赵销售</option>
+                                </select>
+                                <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                            
+                            <div class="relative">
+                                <select class="appearance-none pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white">
+                                    <option>近7天</option>
+                                    <option>近30天</option>
+                                    <option>本季度</option>
+                                    <option>本年度</option>
+                                    <option>自定义</option>
+                                </select>
+                                <i class="fa fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <button class="border border-gray-200 hover:bg-gray-50 text-gray-600 px-4 py-2 rounded-lg transition-all text-sm flex items-center gap-1">
+                                <i class="fa fa-download"></i>
+                                <span>导出数据</span>
+                            </button>
+                            
+                            <button class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-all text-sm flex items-center gap-1">
+                                <i class="fa fa-refresh"></i>
+                                <span>刷新数据</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 销售概览卡片 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-xl p-5 card-shadow card-hover">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500">总销售额</p>
+                                <h3 class="text-2xl font-bold mt-1">¥2,568,900</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <i class="fa fa-line-chart text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-success text-sm flex items-center">
+                                <i class="fa fa-arrow-up mr-1"></i>12.5%
+                            </span>
+                            <span class="text-xs text-gray-500 ml-2">较上月</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-5 card-shadow card-hover">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500">销售数量</p>
+                                <h3 class="text-2xl font-bold mt-1">86 辆</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+                                <i class="fa fa-car text-secondary"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-success text-sm flex items-center">
+                                <i class="fa fa-arrow-up mr-1"></i>8.2%
+                            </span>
+                            <span class="text-xs text-gray-500 ml-2">较上月</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-5 card-shadow card-hover">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500">平均单价</p>
+                                <h3 class="text-2xl font-bold mt-1">¥29,870</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                                <i class="fa fa-tag text-accent"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-danger text-sm flex items-center">
+                                <i class="fa fa-arrow-down mr-1"></i>3.1%
+                            </span>
+                            <span class="text-xs text-gray-500 ml-2">较上月</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-5 card-shadow card-hover">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-sm text-gray-500">库存周转率</p>
+                                <h3 class="text-2xl font-bold mt-1">6.8 次/年</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                                <i class="fa fa-refresh text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-success text-sm flex items-center">
+                                <i class="fa fa-arrow-up mr-1"></i>1.2%
+                            </span>
+                            <span class="text-xs text-gray-500 ml-2">较上月</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 销售趋势图表和库存周转率分析 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white rounded-xl p-5 card-shadow lg:col-span-2">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-lg">销售趋势分析</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary">周</button>
+                                <button class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 hover:bg-primary/10 hover:text-primary transition-all">月</button>
+                                <button class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 hover:bg-primary/10 hover:text-primary transition-all">季</button>
+                                <button class="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-600 hover:bg-primary/10 hover:text-primary transition-all">年</button>
+                            </div>
+                        </div>
+                        <div class="h-80">
+                            <canvas id="salesTrendChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl p-5 card-shadow">
+                        <h3 class="font-bold text-lg mb-6">库存周转率分析</h3>
+                        <div class="h-64 mb-6">
+                            <canvas id="inventoryTurnoverChart"></canvas>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>轿车</span>
+                                    <span class="font-medium">7.2 次/年</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full" style="width: 72%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>SUV</span>
+                                    <span class="font-medium">8.5 次/年</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-secondary h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>MPV</span>
+                                    <span class="font-medium">4.3 次/年</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-warning h-2 rounded-full" style="width: 43%"></div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>新能源</span>
+                                    <span class="font-medium">9.7 次/年</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-success h-2 rounded-full" style="width: 97%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 销售数据统计和业绩排行榜 -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 按车型统计 -->
+                    <div class="bg-white rounded-xl p-5 card-shadow">
+                        <h3 class="font-bold text-lg mb-6">按车型销售统计</h3>
+                        <div class="h-64">
+                            <canvas id="salesByModelChart"></canvas>
+                        </div>
+                        
+                        <div class="mt-6 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-primary mr-2"></span>
+                                    <span class="text-sm">轿车</span>
+                                </div>
+                                <span class="text-sm font-medium">32 辆 (37.2%)</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-secondary mr-2"></span>
+                                    <span class="text-sm">SUV</span>
+                                </div>
+                                <span class="text-sm font-medium">28 辆 (32.6%)</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-warning mr-2"></span>
+                                    <span class="text-sm">MPV</span>
+                                </div>
+                                <span class="text-sm font-medium">12 辆 (14.0%)</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <span class="w-3 h-3 rounded-full bg-success mr-2"></span>
+                                    <span class="text-sm">新能源</span>
+                                </div>
+                                <span class="text-sm font-medium">14 辆 (16.3%)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 按销售顾问统计 -->
+                    <div class="bg-white rounded-xl p-5 card-shadow">
+                        <h3 class="font-bold text-lg mb-6">按销售顾问统计</h3>
+                        <div class="h-64">
+                            <canvas id="salesByConsultantChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- 业绩排行榜 -->
+                    <div class="bg-white rounded-xl p-5 card-shadow">
+                        <h3 class="font-bold text-lg mb-6">销售业绩排行榜</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center p-3 bg-primary/5 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold mr-3">1</div>
+                                <img src="https://picsum.photos/id/1012/40/40" alt="李销售" class="w-10 h-10 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="font-medium">李销售</p>
+                                    <p class="text-xs text-gray-500">销售一部</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold">¥685,200</p>
+                                    <p class="text-xs text-success">+15.3%</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mr-3">2</div>
+                                <img src="https://picsum.photos/id/1006/40/40" alt="王销售" class="w-10 h-10 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="font-medium">王销售</p>
+                                    <p class="text-xs text-gray-500">销售二部</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold">¥592,800</p>
+                                    <p class="text-xs text-success">+8.7%</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mr-3">3</div>
+                                <img src="https://picsum.photos/id/1009/40/40" alt="张销售" class="w-10 h-10 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="font-medium">张销售</p>
+                                    <p class="text-xs text-gray-500">销售一部</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold">¥521,500</p>
+                                    <p class="text-xs text-success">+12.1%</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mr-3">4</div>
+                                <img src="https://picsum.photos/id/1074/40/40" alt="赵销售" class="w-10 h-10 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="font-medium">赵销售</p>
+                                    <p class="text-xs text-gray-500">销售三部</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold">¥428,600</p>
+                                    <p class="text-xs text-danger">-2.4%</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mr-3">5</div>
+                                <img src="https://picsum.photos/id/1027/40/40" alt="刘销售" class="w-10 h-10 rounded-full mr-3">
+                                <div class="flex-1">
+                                    <p class="font-medium">刘销售</p>
+                                    <p class="text-xs text-gray-500">销售二部</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-bold">¥340,800</p>
+                                    <p class="text-xs text-success">+5.8%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        // 侧边栏切换功能（移动端）
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('h-full');
+        });
+        
+        // 销售趋势图表
+        const salesTrendCtx = document.getElementById('salesTrendChart').getContext('2d');
+        const salesTrendChart = new Chart(salesTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                datasets: [
+                    {
+                        label: '销售额 (万元)',
+                        data: [32, 45, 38, 52, 49, 68, 56],
+                        borderColor: '#165DFF',
+                        backgroundColor: 'rgba(22, 93, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: '销售数量 (辆)',
+                        data: [8, 12, 10, 14, 11, 18, 15],
+                        borderColor: '#36CFC9',
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        borderDash: [5, 5],
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            boxWidth: 10,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1D2129',
+                        bodyColor: '#4E5969',
+                        borderColor: 'rgba(22, 93, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 5,
+                        usePointStyle: true,
+                        callbacks: {
+                            labelPointStyle: function(context) {
+                                return {
+                                    pointStyle: 'circle',
+                                    rotation: 0
+                                };
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '销售额 (万元)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '销售数量 (辆)'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 库存周转率图表
+        const inventoryTurnoverCtx = document.getElementById('inventoryTurnoverChart').getContext('2d');
+        const inventoryTurnoverChart = new Chart(inventoryTurnoverCtx, {
+            type: 'radar',
+            data: {
+                labels: ['轿车', 'SUV', 'MPV', '新能源', '跑车', '皮卡'],
+                datasets: [{
+                    label: '本季度',
+                    data: [7.2, 8.5, 4.3, 9.7, 3.2, 5.1],
+                    backgroundColor: 'rgba(22, 93, 255, 0.2)',
+                    borderColor: '#165DFF',
+                    pointBackgroundColor: '#165DFF',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#165DFF'
+                }, {
+                    label: '上季度',
+                    data: [6.8, 7.9, 4.5, 8.2, 3.0, 4.8],
+                    backgroundColor: 'rgba(54, 207, 201, 0.2)',
+                    borderColor: '#36CFC9',
+                    pointBackgroundColor: '#36CFC9',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#36CFC9'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        pointLabels: {
+                            font: {
+                                size: 11
+                            }
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 12
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 10,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 按车型销售统计图表
+        const salesByModelCtx = document.getElementById('salesByModelChart').getContext('2d');
+        const salesByModelChart = new Chart(salesByModelCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['轿车', 'SUV', 'MPV', '新能源'],
+                datasets: [{
+                    data: [32, 28, 12, 14],
+                    backgroundColor: [
+                        '#165DFF',
+                        '#36CFC9',
+                        '#FAAD14',
+                        '#52C41A'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1D2129',
+                        bodyColor: '#4E5969',
+                        borderColor: 'rgba(22, 93, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 5,
+                        usePointStyle: true,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} 辆 (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 按销售顾问统计图表
+        const salesByConsultantCtx = document.getElementById('salesByConsultantChart').getContext('2d');
+        const salesByConsultantChart = new Chart(salesByConsultantCtx, {
+            type: 'bar',
+            data: {
+                labels: ['李销售', '王销售', '张销售', '赵销售', '刘销售'],
+                datasets: [{
+                    label: '销售额 (万元)',
+                    data: [68.5, 59.3, 52.2, 42.9, 34.1],
+                    backgroundColor: [
+                        '#165DFF',
+                        '#36CFC9',
+                        '#722ED1',
+                        '#FAAD14',
+                        '#52C41A'
+                    ],
+                    borderRadius: 6,
+                    barThickness: 24
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1D2129',
+                        bodyColor: '#4E5969',
+                        borderColor: 'rgba(22, 93, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        boxPadding: 5
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 添加图表动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const charts = [salesTrendChart, inventoryTurnoverChart, salesByModelChart, salesByConsultantChart];
+            
+            // 简单的图表动画触发
+            charts.forEach(chart => {
+                setTimeout(() => {
+                    chart.update();
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
+2
